@@ -66,6 +66,7 @@ for field in fields:
 
 priorities = [
     'sf',
+    'type',
     'Rd',
     'Rt',
     'Rn',

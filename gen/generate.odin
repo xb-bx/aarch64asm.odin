@@ -38,10 +38,13 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
         append(&mnemonics[instr.mnemonic], instr.id)
     }
     is_sf := instr.fields[0].name == "sf"
+    is_float := instr.fields[0].name == "type"
+    is_sf_or_float := is_sf || is_float
     fd, err := os.open(fmt.aprintf("%s/%s.gen.odin", dir, instr.id), os.O_CREATE | os.O_TRUNC | os.O_WRONLY, 0o644)
     fmt.fprintln(fd, "package aarch64")
+    fmt.fprintln(fd, "@private")
     fmt.fprintf(fd, "%s :: #force_inline proc(a: ^Assembler,", instr.id)
-    flds := is_sf ? instr.fields[1:] : instr.fields
+    flds := is_sf_or_float ? instr.fields[1:] : instr.fields
     decld := false
     for fld in flds {
         type: string = ""
@@ -55,6 +58,7 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
         } else if strings.starts_with(fld.name, "R") {
             name = fld.name
             type = is_sf ? decld ? "T" : "$T" : "XReg"
+            type = is_float ? decld ? "T" : "$T" : type
             decld = true
         } else if strings.starts_with(fld.name, "imm") {
             name = fld.name
@@ -79,6 +83,8 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
     }
     if is_sf {
         fmt.fprintln(fd, ") where T == XReg || T == WReg {")
+    } else if is_float {
+        fmt.fprintln(fd, ") where T == DReg || T == SReg || T == HReg {")
     } else {
         fmt.fprintln(fd, ") {")
     }
@@ -92,7 +98,9 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
     }
     if is_sf {
         fmt.fprintfln(fd, "when T == XReg {{ result |= ((1) << %i) }", instr.fields[0].start)
-        // fmt.fprintln(fd, "result |= ((u32(%s) & %i) << %i)", fld.name, fld.width, fld.start)
+    } else if is_float {
+        fmt.fprintfln(fd, "when T == HReg {{ result |= ((0b11) << %i) }", instr.fields[0].start)
+        fmt.fprintfln(fd, "when T == DReg {{ result |= ((0b01) << %i) }", instr.fields[0].start)
     }
     fmt.fprintln(fd, "append(&a.bytes, result)")
     fmt.fprintln(fd, "}")

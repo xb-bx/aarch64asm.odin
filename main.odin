@@ -102,6 +102,207 @@ assemble :: proc(using assebler: ^Assembler) {
 	}
 
 }
+
+HReg :: enum {
+	H0  = 0,
+	H1  = 1,
+	H2  = 2,
+	H3  = 3,
+	H4  = 4,
+	H5  = 5,
+	H6  = 6,
+	H7  = 7,
+	H8  = 8,
+	H9  = 9,
+	H10 = 10,
+	H11 = 11,
+	H12 = 12,
+	H13 = 13,
+	H14 = 14,
+	H15 = 15,
+	H16 = 16,
+	H17 = 17,
+	H18 = 18,
+	H19 = 19,
+	H20 = 20,
+	H21 = 21,
+	H22 = 22,
+	H23 = 23,
+	H24 = 24,
+	H25 = 25,
+	H26 = 26,
+	H27 = 27,
+	H28 = 28,
+	H29 = 29,
+	H30 = 30,
+    H31 = 31,
+}
+h0 :: HReg.H0
+h1 :: HReg.H1
+h2 :: HReg.H2
+h3 :: HReg.H3
+h4 :: HReg.H4
+h5 :: HReg.H5
+h6 :: HReg.H6
+h7 :: HReg.H7
+h8 :: HReg.H8
+h9 :: HReg.H9
+h10 :: HReg.H10
+h11 :: HReg.H11
+h12 :: HReg.H12
+h13 :: HReg.H13
+h14 :: HReg.H14
+h15 :: HReg.H15
+h16 :: HReg.H16
+h17 :: HReg.H17
+h18 :: HReg.H18
+h19 :: HReg.H19
+h20 :: HReg.H20
+h21 :: HReg.H21
+h22 :: HReg.H22
+h23 :: HReg.H23
+h24 :: HReg.H24
+h25 :: HReg.H25
+h26 :: HReg.H26
+h27 :: HReg.H27
+h28 :: HReg.H28
+h29 :: HReg.H29
+h30 :: HReg.H30
+h31 :: HReg.H31
+
+SReg :: enum {
+	S0  = 0,
+	S1  = 1,
+	S2  = 2,
+	S3  = 3,
+	S4  = 4,
+	S5  = 5,
+	S6  = 6,
+	S7  = 7,
+	S8  = 8,
+	S9  = 9,
+	S10 = 10,
+	S11 = 11,
+	S12 = 12,
+	S13 = 13,
+	S14 = 14,
+	S15 = 15,
+	S16 = 16,
+	S17 = 17,
+	S18 = 18,
+	S19 = 19,
+	S20 = 20,
+	S21 = 21,
+	S22 = 22,
+	S23 = 23,
+	S24 = 24,
+	S25 = 25,
+	S26 = 26,
+	S27 = 27,
+	S28 = 28,
+	S29 = 29,
+	S30 = 30,
+    S31 = 31,
+}
+s0 :: SReg.S0
+s1 :: SReg.S1
+s2 :: SReg.S2
+s3 :: SReg.S3
+s4 :: SReg.S4
+s5 :: SReg.S5
+s6 :: SReg.S6
+s7 :: SReg.S7
+s8 :: SReg.S8
+s9 :: SReg.S9
+s10 :: SReg.S10
+s11 :: SReg.S11
+s12 :: SReg.S12
+s13 :: SReg.S13
+s14 :: SReg.S14
+s15 :: SReg.S15
+s16 :: SReg.S16
+s17 :: SReg.S17
+s18 :: SReg.S18
+s19 :: SReg.S19
+s20 :: SReg.S20
+s21 :: SReg.S21
+s22 :: SReg.S22
+s23 :: SReg.S23
+s24 :: SReg.S24
+s25 :: SReg.S25
+s26 :: SReg.S26
+s27 :: SReg.S27
+s28 :: SReg.S28
+s29 :: SReg.S29
+s30 :: SReg.S30
+s31 :: SReg.S31
+DReg :: enum {
+	D0  = 0,
+	D1  = 1,
+	D2  = 2,
+	D3  = 3,
+	D4  = 4,
+	D5  = 5,
+	D6  = 6,
+	D7  = 7,
+	D8  = 8,
+	D9  = 9,
+	D10 = 10,
+	D11 = 11,
+	D12 = 12,
+	D13 = 13,
+	D14 = 14,
+	D15 = 15,
+	D16 = 16,
+	D17 = 17,
+	D18 = 18,
+	D19 = 19,
+	D20 = 20,
+	D21 = 21,
+	D22 = 22,
+	D23 = 23,
+	D24 = 24,
+	D25 = 25,
+	D26 = 26,
+	D27 = 27,
+	D28 = 28,
+	D29 = 29,
+	D30 = 30,
+    D31 = 31,
+}
+d0 :: DReg.D0
+d1 :: DReg.D1
+d2 :: DReg.D2
+d3 :: DReg.D3
+d4 :: DReg.D4
+d5 :: DReg.D5
+d6 :: DReg.D6
+d7 :: DReg.D7
+d8 :: DReg.D8
+d9 :: DReg.D9
+d10 :: DReg.D10
+d11 :: DReg.D11
+d12 :: DReg.D12
+d13 :: DReg.D13
+d14 :: DReg.D14
+d15 :: DReg.D15
+d16 :: DReg.D16
+d17 :: DReg.D17
+d18 :: DReg.D18
+d19 :: DReg.D19
+d20 :: DReg.D20
+d21 :: DReg.D21
+d22 :: DReg.D22
+d23 :: DReg.D23
+d24 :: DReg.D24
+d25 :: DReg.D25
+d26 :: DReg.D26
+d27 :: DReg.D27
+d28 :: DReg.D28
+d29 :: DReg.D29
+d30 :: DReg.D30
+d31 :: DReg.D31
+
 XReg :: enum {
 	X0  = 0,
 	X1  = 1,
@@ -134,6 +335,7 @@ XReg :: enum {
 	X28 = 28,
 	X29 = 29,
 	X30 = 30,
+    XSP = 31,
 }
 WReg :: enum {
 	W0  = 0,
@@ -167,6 +369,7 @@ WReg :: enum {
 	W28 = 28,
 	W29 = 29,
 	W30 = 30,
+    WSP = 31,
 }
 w0 :: WReg.W0
 w1 :: WReg.W1
@@ -199,6 +402,7 @@ w27 :: WReg.W27
 w28 :: WReg.W28
 w29 :: WReg.W29
 w30 :: WReg.W30
+wsp :: WReg.WSP
 
 x0 :: XReg.X0
 x1 :: XReg.X1
@@ -231,6 +435,8 @@ x27 :: XReg.X27
 x28 :: XReg.X28
 x29 :: XReg.X29
 x30 :: XReg.X30
+xsp :: XReg.XSP
+
 Extend :: enum {
     UXTB,
     UXTH,

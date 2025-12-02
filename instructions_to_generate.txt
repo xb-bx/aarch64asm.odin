@@ -25,3 +25,11 @@ ldr_reg_gen
 ret
 mov_movz
 mov_orr_log_shift
+bl
+blr
+fadd_float
+fsub_float
+fmul_float
+fdiv_float
+fmov_float
+
