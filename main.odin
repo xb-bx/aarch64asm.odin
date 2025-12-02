@@ -1,5 +1,6 @@
 package aarch64
 import "core:fmt"
+import "core:mem/virtual"
 masks: [31]u32 = {
 0x1,
 0x3,
@@ -94,9 +95,7 @@ set_label :: proc(using assembler: ^Assembler, lbl: Label) {
 assemble :: proc(using assebler: ^Assembler) {
 	for place in labelplaces {
 		lbl := labels[place.id]
-        fmt.println(place, lbl)
 		offset := u32((lbl.offset - (place.offset)))
-        fmt.printfln("%4X %i", offset, i32(offset))
         offset &= masks[place.size - 1]
         offset <<= u32(place.start)
         bytes[place.offset] |= offset
@@ -248,19 +247,47 @@ Shift :: enum {
     ASR,
     ROR,
 }
+compile_fibonacci :: proc(a: ^Assembler) {
+    num1 := x1
+    num2 := x2
+    next := x3
+    n := x0
+    i := x4
+    mov(a, num1, 0)
+    mov(a, num2, 1)
+    mov(a, next, 0)
+    mov(a, i, 3)
 
+    loop_body := create_label(a)
+    loop_cond := create_label(a)
+    loop_end := create_label(a)
+
+    set_label(a, loop_cond) 
+        cmp(a, i, n)
+        b(a, Cond.GT, loop_end)
+    
+    set_label(a, loop_body)
+        add(a, next, num1, num2)
+        mov(a, num1, num2)
+        mov(a, num2, next)
+        add(a, i, i, 1) 
+        b(a, loop_cond)
+    set_label(a, loop_end)
+        mov(a, x0, next)
+        ret(a, x30)
+}
 main :: proc() {
 	a: Assembler = {}
+
 	init_asm(&a)
-	lbl := create_label(&a)
-    b(&a, lbl)
-	set_label(&a, lbl)
-    sub(&a, x3, x2, x1)
-	b(&a, Cond.LT, lbl)
-    b(&a, lbl) 
+    compile_fibonacci(&a)
     assemble(&a)
 
-	for b in a.bytes {
-		fmt.printfln("%8X", b)
-	}
+    block, err := virtual.memory_block_alloc(4096, 4096, 32)
+    copy(block.base[:len(a.bytes)*4], (cast([^]u8)&a.bytes[0])[:len(a.bytes)*4])
+    virtual.protect(transmute(rawptr)(transmute(u64)(block.base) & (~u64(0xFFF))), 4096, {.Read, .Write, .Execute})
+
+    fibonacci := transmute(proc "c" (n1: i64) -> i64)block.base
+
+    fmt.println(fibonacci(20))
 }

@@ -68,6 +68,9 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
         } else if strings.starts_with(fld.name, "cond") {
             name = fld.name
             type = "Cond"
+        } else if strings.starts_with(fld.name, "hw") {
+            name = fld.name
+            type = "i8 = 0"
         } else {
             fmt.println(fld)
             panic("todo")

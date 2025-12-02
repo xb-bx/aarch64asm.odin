@@ -22,3 +22,6 @@ ldrh_reg
 ldr_imm_gen
 ldr_lit_gen
 ldr_reg_gen
+ret
+mov_movz
+mov_orr_log_shift

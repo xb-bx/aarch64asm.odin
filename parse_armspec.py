@@ -72,10 +72,11 @@ priorities = [
     'Rm',
     'cond',
     'shift',
-    'shiftbool',
     'label',
     'imm',
+    'shiftbool',
     'option',
+    'hw',
 ]
 sortedfields = []
 for prio in priorities:
@@ -89,6 +90,10 @@ if len(fields) != 0:
     sys.exit(1)
 
 mnemonic = root.xpath('//docvar[@key="mnemonic"]')[0].attrib['value']
+res = root.xpath('//docvar[@key="alias_mnemonic"]')
+if len(res) != 0:
+    mnemonic = res[0].attrib['value']
+
 
 json.dump(SimpleNamespace(id=instr_id,opcode=opcode,fields=sortedfields,mnemonic=mnemonic), default=vars, fp=sys.stdout)
 

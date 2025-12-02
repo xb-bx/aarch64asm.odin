@@ -1,8 +1,9 @@
 *.gen.odin
 gen.bin
+aarch64asm.cross
 aarch64asm
 armspec/
 armspec.tar.gz
 instructions/
 instructions.json
-
+*.o
