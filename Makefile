@@ -13,7 +13,7 @@ GEN_FILES=$(shell cat instructions_to_generate.txt | sed 's/$$/.gen.odin/g')
 	mkdir -p ./instructions
 	rm -rf ./instructions/*
 	for i in $$(cat ./instructions_to_generate.txt); do \
-		./parse_armspec.py ./armspec/ISA_v82A_A64_xml_00bet3.1/$$i.xml > instructions/$$i.json ; \
+		./parse_variants.py ./armspec/ISA_v82A_A64_xml_00bet3.1_OPT/$$i.xml > instructions/$$i.json ; \
 	done
 	jq -s '.' ./instructions/*.json > ./instructions.json
 $(GEN_FILES): ./gen.bin ./instructions.json
