@@ -42,3 +42,4 @@ fcvtzs_float_int
 fcvtzu_float_int
 fmov_float
 fmov_float_gen
+stp_gen

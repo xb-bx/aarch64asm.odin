@@ -159,6 +159,11 @@ MemoryLocationRegUnsignedImm :: struct {
     reg: XReg,
     imm: uint,
 }
+MemoryLocationRegSignedImm :: struct {
+    reg: XReg,
+    imm: int,
+}
+at_signed :: proc(x: XReg, imm: uint) -> MemoryLocationRegUnsignedImm { return  MemoryLocationRegUnsignedImm { x, imm } }
 at_unsigned :: proc(x: XReg, imm: uint) -> MemoryLocationRegUnsignedImm { return  MemoryLocationRegUnsignedImm { x, imm } }
 
 at_imm :: proc(x: XReg, imm: int) -> MemoryLocationRegImmPre { return  MemoryLocationRegImmPre { x, imm, } }
@@ -203,16 +208,7 @@ main :: proc() {
 	a: Assembler = {}
 
 	init_asm(&a)
-    str(&a, w(0), at(x(0), w(1), true, true))
-    str(&a, w(0), at(x(0), x(1), true))
-    str(&a, w(0), at(x(0), w(1), false, false))
-    str(&a, w(0), at(x(0), x(1), false))
-    str(&a, x(0), at(x(0), w(1), true, true))
-    str(&a, x(0), at(x(0), x(1), true))
-    str(&a, x(0), at(x(0), w(1), false, false))
-    str(&a, x(0), at(x(0), x(1), false))
-    STR_64_ldst_immpre(&a, x(0), at(x(1), -30))
-    str(&a, x(0), at_post(x(1), 128))
+    stp(&a, x(0), x(1), at_imm(x(31), -16))
     // compile_fibonacci(&a)
     // assemble(&a)
     //

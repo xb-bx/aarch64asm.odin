@@ -3,6 +3,7 @@ import lxml.etree as ET
 import itertools
 import sys
 import json
+import re
 from types import SimpleNamespace
 
 root: ET._Element = ET.parse(sys.argv[1]).getroot()
@@ -17,6 +18,7 @@ priorities = [
     'type',
     'Rd',
     'Rt',
+    'Rt2',
     'Rn',
     'Rm',
     'cond',
@@ -68,6 +70,16 @@ def sort_fields(fields):
     
 def parse_encoding(enc: ET._Element, base_opcode, base_fields):
     boxes = enc.xpath('box')
+    offset_type = enc.xpath('docvars/docvar[@key="offset-type"]')
+    offset_info = None
+    if len(offset_type) == 1:
+        res = re.match(r"off([0-9]+)([su])_([su])", offset_type[0].attrib['value'])
+        if res != None:
+            size, signed, scaled = res.groups()
+            size = int(size)
+            signed = signed == 's'
+            scaled = scaled == 's'
+            offset_info = SimpleNamespace(size=size, scaled=scaled, signed=signed)
     enc_fields = copy_fields(base_fields)
     opcode = base_opcode
     enc_name = enc.attrib['name']
@@ -96,7 +108,7 @@ def parse_encoding(enc: ET._Element, base_opcode, base_fields):
         type_field(field, enc_name)
 
     enc_fields = sort_fields(enc_fields)
-    return SimpleNamespace(name=enc_name, opcode=opcode, fields=enc_fields)
+    return SimpleNamespace(name=enc_name, opcode=opcode, fields=enc_fields, offset_info=offset_info)
 
 
 def parse_class(cls: ET._Element, len_classes):
@@ -141,6 +153,7 @@ def parse_class(cls: ET._Element, len_classes):
     if name == 'Post-index': name = 'post'
     if name == 'Pre-index': name = 'pre'
     if name == 'Unsigned offset': name = 'unsigned_off'
+    if name == 'Signed offset': name = 'signed_off'
     is_mem = findfld(fields, "Rt") != None
     # print(encs)
     if is_mem:

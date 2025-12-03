@@ -18,10 +18,16 @@ Class :: struct {
     encodings: []Variant,
     is_mem: bool,
 }
+OffsetInfo :: struct {
+    size: int,
+    scaled: bool,
+    signed: bool,
+}
 Variant :: struct {
     name   : string,
     opcode : int,
     fields : []Field,
+    offset_info: OffsetInfo,
 }
 
 Instruction :: struct {
@@ -59,6 +65,7 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
             if class.is_mem {
                 append(&mnemonics[mnemonic], variant.name)
                 rt := Field {}
+                rt2 := Field {}
                 rn := Field {}
                 rm := Field {}
                 imm := Field {}
@@ -66,6 +73,7 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
                 option := Field {}
                 for fld in variant.fields {
                     if fld.name == "Rt" do rt = fld
+                    if fld.name == "Rt2" do rt2 = fld
                     else if fld.name == "Rn" do rn = fld
                     else if fld.name == "Rm" do rm = fld
                     else if fld.name == "S" do s = fld
@@ -94,6 +102,7 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
                     panic(rt.type)
                 }
                 fmt.fprint(fd, "Rt:", rttype, ",")
+                if rt2.name != "" do fmt.fprint(fd, "Rt2:", rttype, ",")
                 mem_type := ""
                 if class.name == "post" {
                     mem_type = "MemoryLocationRegImmPost"
@@ -101,6 +110,8 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
                     mem_type = "MemoryLocationRegImmPre"
                 } else if class.name == "unsigned_off" {
                     mem_type = "MemoryLocationRegUnsignedImm"
+                } else if class.name == "signed_off" {
+                    mem_type = "MemoryLocationRegSignedImm"
                 } else {
                     switch rm.type {
                     case "w":
@@ -112,15 +123,17 @@ generate_instruction :: proc(instr: Instruction, dir: string, mnemonics: ^map[st
                         panic(rm.type)
                     }
                 }
+                scale := rt.type == "x" ? 3 : 2 
                 fmt.fprintln(fd, "mem:", mem_type, ") {")
                 fmt.fprintfln(fd, "result: u32 = 0x%4X", variant.opcode)
                 fmt.fprintfln(fd, "result |= ((u32(Rt) & 0b%s) << %i)", ones[:rt.width], rt.start)
+                if rt2.name != "" do fmt.fprintfln(fd, "result |= ((u32(Rt2) & 0b%s) << %i)", ones[:rt2.width], rt2.start)
                 if class.name == "post" || class.name == "pre" {
                     fmt.fprintfln(fd, "result |= ((u32(mem.reg) & 0b%s) << %i)", ones[:rn.width], rn.start)
-                    fmt.fprintfln(fd, "result |= ((u32(mem.imm) & 0b%s) << %i)", ones[:imm.width], imm.start)
-                } else if class.name == "unsigned_off" { 
+                    fmt.fprintfln(fd, "result |= ((u32(mem.imm >> %i) & 0b%s) << %i)", variant.offset_info.scaled ? scale : 1, ones[:imm.width], imm.start)
+                } else if class.name == "unsigned_off" || class.name == "signed_off" { 
                     fmt.fprintfln(fd, "result |= ((u32(mem.reg) & 0b%s) << %i)", ones[:rn.width], rn.start)
-                    fmt.fprintfln(fd, "result |= ((u32(mem.imm >> %i) & 0b%s) << %i)", rt.type == "x" ? 3 : 2, ones[:imm.width], imm.start)
+                    fmt.fprintfln(fd, "result |= ((u32(mem.imm >> %i) & 0b%s) << %i)", variant.offset_info.scaled ? scale : 1, ones[:imm.width], imm.start)
                 } else {
                     fmt.fprintfln(fd, "result |= ((u32(mem.regbase) & 0b%s) << %i)", ones[:rn.width], rn.start)
                     fmt.fprintfln(fd, "result |= ((u32(mem.regoffset) & 0b%s) << %i)", ones[:rm.width], rm.start)
